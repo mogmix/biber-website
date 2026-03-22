@@ -1,0 +1,25 @@
+@import "tailwindcss";
+
+:root {
+  /* Map colours */
+  --color-land-default: #d1d5db;
+  --color-land-hover: #9ca3af;
+  --color-land-1: #dcfce7;
+  --color-land-2: #86efac;
+  --color-land-3: #4ade80;
+  --color-land-4: #16a34a;
+  --color-land-5: #14532d;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-land-default: #374151;
+    --color-land-hover: #4b5563;
+  }
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
