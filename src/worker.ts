@@ -76,14 +76,14 @@ async function handlePostSighting(request: Request, env: Env): Promise<Response>
 
   const db = getDb(env);
 
-  // Rate limit: same (browser_id, bundesland) within the last 3 hours
+  // Rate limit: same browser_id within the last 3 hours (any Bundesland)
   const recent = await db.execute({
     sql: `SELECT reported_at FROM sightings
-          WHERE browser_id = ? AND bundesland = ?
+          WHERE browser_id = ?
           AND reported_at > datetime('now', '-3 hours')
           ORDER BY reported_at DESC
           LIMIT 1`,
-    args: [browser_id, bundesland],
+    args: [browser_id],
   });
 
   if (recent.rows.length > 0) {
