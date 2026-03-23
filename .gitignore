@@ -1,5 +1,6 @@
 # env
 .env
+.dev.vars
 
 # Logs
 logs
@@ -13,7 +14,9 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
+dist-worker
 *.local
+.wrangler
 
 # Editor directories and files
 .vscode/*
