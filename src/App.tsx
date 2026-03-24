@@ -61,31 +61,46 @@ function MapView() {
         Zum Hauptinhalt springen
       </a>
       <Header />
+      <div className="w-full px-4 sm:px-6 py-2 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+        <p className="max-w-lg sm:max-w-2xl mx-auto text-sm text-gray-500 dark:text-gray-400">
+          🦫 Wir nagen uns vor — eine Sichtung nach der anderen.
+        </p>
+      </div>
       <main id="main-content" className="flex-1 py-6 px-4 sm:px-6">
-        <div className="max-w-lg mx-auto sm:max-w-2xl">
-          {fetchError ? (
-            <div className="flex flex-col items-center gap-3 py-16 text-center">
-              <p className="text-gray-600 dark:text-gray-400 text-sm">
-                Daten konnten nicht geladen werden.
-              </p>
-              <button
-                type="button"
-                onClick={() => setRetryCount(n => n + 1)}
-                className="text-sm text-blue-600 dark:text-blue-400 underline"
-              >
-                Erneut versuchen
-              </button>
-            </div>
-          ) : (
-            <>
-              <ErrorBoundary>
-                <GermanyMap year={year} counts={counts} onCountsChange={setCounts} isLoading={isLoading} />
-              </ErrorBoundary>
-              <ErrorBoundary>
-                <StatsPanel counts={counts} year={year} availableYears={availableYears} onYearChange={setYear} isLoading={isLoading} />
-              </ErrorBoundary>
-            </>
-          )}
+        <div className="max-w-4xl mx-auto flex flex-col lg:flex-row lg:gap-12 lg:items-start">
+          <div className="flex-1 min-w-0">
+            {fetchError ? (
+              <div className="flex flex-col items-center gap-3 py-16 text-center">
+                <p className="text-gray-600 dark:text-gray-400 text-sm">
+                  Daten konnten nicht geladen werden.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setRetryCount(n => n + 1)}
+                  className="text-sm text-blue-600 dark:text-blue-400 underline"
+                >
+                  Erneut versuchen
+                </button>
+              </div>
+            ) : (
+              <>
+                <ErrorBoundary>
+                  <GermanyMap year={year} counts={counts} onCountsChange={setCounts} isLoading={isLoading} />
+                </ErrorBoundary>
+                <ErrorBoundary>
+                  <StatsPanel counts={counts} year={year} availableYears={availableYears} onYearChange={setYear} isLoading={isLoading} />
+                </ErrorBoundary>
+              </>
+            )}
+          </div>
+          <div className="hidden lg:block lg:w-72 lg:shrink-0 lg:sticky lg:top-6">
+            <img
+              src="/beaver-illustration.png"
+              alt=""
+              aria-hidden="true"
+              className="w-full"
+            />
+          </div>
         </div>
       </main>
       <Footer />
@@ -96,7 +111,11 @@ function MapView() {
 export default function App() {
   const pathname = usePathname()
 
-  if (pathname === '/impressum') return <LegalPage content={impressumContent} />
-  if (pathname === '/datenschutz') return <LegalPage content={datenschutzContent} />
-  return <MapView />
+  return (
+    <div key={pathname} className="page-fade">
+      {pathname === '/impressum' ? <LegalPage content={impressumContent} /> :
+       pathname === '/datenschutz' ? <LegalPage content={datenschutzContent} /> :
+       <MapView />}
+    </div>
+  )
 }

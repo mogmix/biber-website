@@ -10,7 +10,7 @@ export default function Header() {
         className="h-10 w-auto object-contain shrink-0"
       />
       <div>
-        <h1 className="text-white font-bold text-lg sm:text-xl leading-tight">
+        <h1 className="font-display text-white font-bold text-lg sm:text-xl leading-tight">
           Biberkarte Deutschland
         </h1>
         <p className="text-white/70 text-xs sm:text-sm">

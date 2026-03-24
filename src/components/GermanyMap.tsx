@@ -245,9 +245,15 @@ export default function GermanyMap({ year: _year, counts, onCountsChange, isLoad
         className="sr-only"
       >
         {globalCooldownSeconds > 0
-          ? `Karte gesperrt. Erneute Meldung möglich in ${formatCountdown(globalCooldownSeconds)}.`
+          ? `Der Biber braucht eine Pause. Nächste Sichtung in ${formatCountdown(globalCooldownSeconds)} möglich.`
           : ''}
       </div>
+
+      {globalCooldownSeconds > 0 && (
+        <p className="mb-3 text-sm text-gray-500 dark:text-gray-400">
+          🦫 Der Biber braucht eine Pause — in {formatCountdown(globalCooldownSeconds)} wieder einsatzbereit.
+        </p>
+      )}
 
       {toastLand && (
         <div
@@ -288,7 +294,7 @@ export default function GermanyMap({ year: _year, counts, onCountsChange, isLoad
                   <g
                     tabIndex={0}
                     role="button"
-                    aria-label={`${name}: ${count} ${count === 1 ? 'Sichtung' : 'Sichtungen'}${globalCooldownSeconds > 0 ? `. Gesperrt für ${formatCountdown(globalCooldownSeconds)}` : ''}`}
+                    aria-label={`${name}: ${count} ${count === 1 ? 'Sichtung' : 'Sichtungen'}${globalCooldownSeconds > 0 ? `. Pause noch ${formatCountdown(globalCooldownSeconds)}` : ''}`}
                     aria-disabled={globalCooldownSeconds > 0 ? 'true' : undefined}
                     onPointerEnter={(e) => { if (e.pointerType !== 'touch') setHovered(code) }}
                     onPointerLeave={(e) => { if (e.pointerType !== 'touch') setHovered(null) }}
@@ -328,7 +334,7 @@ export default function GermanyMap({ year: _year, counts, onCountsChange, isLoad
                     </span>
                     {globalCooldownSeconds > 0 && (
                       <span className="block text-gray-500 dark:text-gray-400 text-xs mt-0.5">
-                        Nächste Sichtung in {formatCountdown(globalCooldownSeconds)} möglich
+                        Noch {formatCountdown(globalCooldownSeconds)} warten
                       </span>
                     )}
                     <Tooltip.Arrow className="fill-white dark:fill-gray-800" />
