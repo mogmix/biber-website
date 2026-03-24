@@ -39,12 +39,14 @@ interface GermanyMapProps {
 export default function GermanyMap({ year = new Date().getFullYear() }: GermanyMapProps) {
   const [counts, setCounts] = useState<Map<string, number>>(new Map())
   const [hovered, setHovered] = useState<string | null>(null)
+  const [touchSelected, setTouchSelected] = useState<string | null>(null)
   const [cooldownUntil, setCooldownUntil] = useState<number>(loadCooldownUntil)
   const [now, setNow] = useState(Date.now())
   const { browserId, nickname, setNickname } = useIdentity()
   const [nicknameInput, setNicknameInput] = useState(nickname)
   const [showNicknamePrompt, setShowNicknamePrompt] = useState(false)
   const nicknameRef = useRef<HTMLInputElement>(null)
+  const latestPointerType = useRef('mouse')
 
   useEffect(() => {
     fetch(`/api/sightings?year=${year}`)
@@ -64,6 +66,20 @@ export default function GermanyMap({ year = new Date().getFullYear() }: GermanyM
 
   function getGlobalCooldownSeconds(): number {
     return Math.max(0, Math.ceil((cooldownUntil - now) / 1000))
+  }
+
+  function handleRegionInteraction(e: React.PointerEvent | React.MouseEvent, code: string) {
+    const pointerType = 'pointerType' in e ? (e as React.PointerEvent).pointerType : latestPointerType.current
+    if (pointerType === 'touch') {
+      if (touchSelected === code) {
+        setTouchSelected(null)
+        handleClick(code)
+      } else {
+        setTouchSelected(code)
+      }
+      return
+    }
+    handleClick(code)
   }
 
   async function handleClick(code: string) {
@@ -139,7 +155,7 @@ export default function GermanyMap({ year = new Date().getFullYear() }: GermanyM
 
   function getFill(code: string): string {
     if (globalCooldownSeconds > 0) return 'var(--color-land-cooldown)'
-    if (code === hovered) return 'var(--color-land-hover)'
+    if (code === touchSelected || code === hovered) return 'var(--color-land-hover)'
     const count = counts.get(code) ?? 0
     if (count === 0) return 'var(--color-land-default)'
     const tier = getQuantileTier(count, sortedNonZero)
@@ -198,13 +214,24 @@ export default function GermanyMap({ year = new Date().getFullYear() }: GermanyM
         >
           {BUNDESLAENDER.map(({ code, name, d }) => {
             const count = counts.get(code) ?? 0
+            const isTooltipOpen = touchSelected === code || hovered === code
             return (
-              <Tooltip.Root key={code}>
+              <Tooltip.Root
+                key={code}
+                open={isTooltipOpen}
+                onOpenChange={(open) => {
+                  if (!open) {
+                    if (hovered === code) setHovered(null)
+                    if (touchSelected === code) setTouchSelected(null)
+                  }
+                }}
+              >
                 <Tooltip.Trigger asChild>
                   <g
-                    onPointerEnter={() => setHovered(code)}
-                    onPointerLeave={() => setHovered(null)}
-                    onClick={() => handleClick(code)}
+                    onPointerEnter={(e) => { if (e.pointerType !== 'touch') setHovered(code) }}
+                    onPointerLeave={(e) => { if (e.pointerType !== 'touch') setHovered(null) }}
+                    onPointerDown={(e) => { latestPointerType.current = e.pointerType }}
+                    onClick={(e) => handleRegionInteraction(e, code)}
                     style={{ cursor: globalCooldownSeconds > 0 ? 'not-allowed' : 'pointer' }}
                   >
                     <path
