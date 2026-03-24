@@ -1,16 +1,16 @@
 # Product Requirements Document (PRD)
 ## Beaver Sighting Tracker — MVP v1.0
 
-**Verein:** [Vereinsname] e.V., Berlin
+**Verein:** Biber Lieber:innen e.V., Berlin
 **Version:** 1.0 — MVP (revised)
 **Datum:** 22. März 2026
-**Autor:** [Name]
+**Autor:** Morgan Tranter
 
 ---
 
 ## 1. Purpose & Context
 
-[Vereinsname] e.V. is a Berlin-based volunteer association of ~10 members dedicated to the observation and conservation of beavers (*Castor fiber*). The association needs a lightweight, members-only web portal centred on one core feature:
+Biber Lieber:innen e.V. is a Berlin-based volunteer association of ~10 members dedicated to the observation and conservation of beavers (*Castor fiber*). The association needs a lightweight, members-only web portal centred on one core feature:
 
 - **Beaver Counter** — an interactive map of Germany's 16 Bundesländer where members report beaver sightings, with basic statistics.
 

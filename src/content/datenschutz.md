@@ -4,7 +4,7 @@
 
 Verantwortlich für die Datenverarbeitung auf dieser Website ist:
 
-**[Vereinsname]**
+**Biber Lieber:innen e.V.**
 [Straße und Hausnummer]
 [PLZ Ort]
 E-Mail: [kontakt@verein.de]

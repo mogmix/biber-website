@@ -1,6 +1,6 @@
 # Impressum
 
-**[Vereinsname]**
+**Biber Lieber:innen e.V.**
 [Straße und Hausnummer]
 [PLZ Ort]
 

@@ -14,7 +14,7 @@ export default function Header() {
           Biberkarte Deutschland
         </h1>
         <p className="text-white/70 text-xs sm:text-sm">
-          Sichtungsmeldungen des Vereins
+          Biber Lieber:innen e.V., Berlin
         </p>
       </div>
     </header>
