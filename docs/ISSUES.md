@@ -30,7 +30,7 @@ Work through these in order. Check off each item when done.
   Save button (~22px tall) and "ändern" link (no padding) are below 44px minimum.
   `src/components/GermanyMap.tsx:184–193`
 
-- [ ] **[H5] Add loading state for API data**
+- [x] **[H5] Add loading state for API data**
   Map shows empty gray on load with no indication data is being fetched. Add `isLoading` state and skeleton/spinner.
   `src/App.tsx`
 
@@ -38,7 +38,7 @@ Work through these in order. Check off each item when done.
 
 ## Medium-term
 
-- [ ] **[M2] Conditionally run the countdown interval**
+- [x] **[M2] Conditionally run the countdown interval**
   `setInterval` fires every second unconditionally. Only start it when cooldown is active; clear it when it reaches 0.
   `src/components/GermanyMap.tsx:48–51`
 
@@ -46,23 +46,23 @@ Work through these in order. Check off each item when done.
   `transition-[width]` triggers layout recalculation. Use `transform: scaleX()` + `transition-transform`.
   `src/components/StatsPanel.tsx:49`
 
-- [ ] **[M4] Delete unused `App.css`**
+- [x] **[M4] Delete unused `App.css`**
   Leftover Vite scaffold template — 184 lines, none of it used. Delete file and remove import.
   `src/App.css`, `src/main.tsx`
 
-- [ ] **[M5] Fix logo `alt` text**
-  `alt="Vereinslogo"` → `alt="Biber Lieber:innen e.V. Logo"`.
+- [x] **[M5] Fix logo `alt` text**
+  `alt="Vereinslogo"` → `alt="Biber Lieber e.V. Logo"`.
   `src/components/Header.tsx:9`
 
 - [ ] **[M6] Add skip-to-main-content link on legal pages**
   `MapView` has one; `LegalPage` doesn't. Add `id="main-content"` to `<main>` and the skip link.
   `src/components/LegalPage.tsx`
 
-- [ ] **[L2] Use brand color on save button**
+- [x] **[L2] Use brand color on save button**
   `bg-green-600` is inconsistent with `--brand-primary` teal used everywhere else.
   `src/components/GermanyMap.tsx:189`
 
-- [ ] **[L3] Add error boundaries around `GermanyMap` and `StatsPanel`**
+- [x] **[L3] Add error boundaries around `GermanyMap` and `StatsPanel`**
   Any runtime error currently blanks the entire app. Add a boundary with a fallback UI.
   `src/App.tsx`
 

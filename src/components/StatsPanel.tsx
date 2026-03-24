@@ -1,3 +1,4 @@
+import { useMemo, memo } from 'react'
 import { BUNDESLAENDER } from '../data/bundeslaender'
 
 interface StatsPanelProps {
@@ -5,14 +6,19 @@ interface StatsPanelProps {
   year: number
   availableYears: number[]
   onYearChange: (year: number) => void
+  isLoading?: boolean
 }
 
-export default function StatsPanel({ counts, year, availableYears, onYearChange }: StatsPanelProps) {
-  const sorted = [...BUNDESLAENDER]
-    .map(({ code, name }) => ({ code, name, count: counts.get(code) ?? 0 }))
-    .sort((a, b) => b.count - a.count)
+const StatsPanel = memo(function StatsPanel({ counts, year, availableYears, onYearChange, isLoading = false }: StatsPanelProps) {
+  const sorted = useMemo(
+    () =>
+      [...BUNDESLAENDER]
+        .map(({ code, name }) => ({ code, name, count: counts.get(code) ?? 0 }))
+        .sort((a, b) => b.count - a.count),
+    [counts]
+  )
 
-  const maxCount = Math.max(1, ...sorted.map(s => s.count))
+  const maxCount = useMemo(() => Math.max(1, ...sorted.map(s => s.count)), [sorted])
 
   return (
     <div className="w-full mt-8">
@@ -33,7 +39,7 @@ export default function StatsPanel({ counts, year, availableYears, onYearChange 
         </div>
       </div>
 
-      <div className="space-y-1.5" role="list" aria-label="Sichtungen nach Bundesland">
+      <div className="space-y-1.5" role="list" aria-label="Sichtungen nach Bundesland" aria-busy={isLoading}>
         {sorted.map(({ code, name, count }) => (
           <div key={code} role="listitem" className="flex items-center gap-2 text-xs sm:text-sm">
             <span className="w-28 sm:w-36 shrink-0 text-right text-gray-600 dark:text-gray-400 truncate" aria-hidden="true">{name}</span>
@@ -61,4 +67,6 @@ export default function StatsPanel({ counts, year, availableYears, onYearChange 
       <p className="text-xs text-gray-600 dark:text-gray-500 mt-2 text-right">Sichtungen</p>
     </div>
   )
-}
+})
+
+export default StatsPanel

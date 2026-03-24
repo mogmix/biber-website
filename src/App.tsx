@@ -4,6 +4,7 @@ import StatsPanel from './components/StatsPanel'
 import Header from './components/Header'
 import Footer from './components/Footer'
 import LegalPage from './components/LegalPage'
+import ErrorBoundary from './components/ErrorBoundary'
 import { usePathname } from './hooks/useRouter'
 import impressumContent from './content/impressum.md?raw'
 import datenschutzContent from './content/datenschutz.md?raw'
@@ -18,21 +19,34 @@ function MapView() {
   const [year, setYear] = useState(currentYear)
   const [counts, setCounts] = useState<Map<string, number>>(new Map())
   const [availableYears, setAvailableYears] = useState<number[]>([currentYear])
+  const [isLoading, setIsLoading] = useState(true)
+  const [fetchError, setFetchError] = useState(false)
 
   useEffect(() => {
-    fetch(`/api/sightings?year=${year}`)
-      .then(r => r.json() as Promise<SightingCount[]>)
+    const controller = new AbortController()
+    setIsLoading(true)
+    setFetchError(false)
+    fetch(`/api/sightings?year=${year}`, { signal: controller.signal })
+      .then(r => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`)
+        return r.json() as Promise<SightingCount[]>
+      })
       .then(data => {
         const map = new Map<string, number>()
         data.forEach(({ bundesland, count }) => map.set(bundesland, count))
         setCounts(map)
       })
-      .catch(() => {})
+      .catch(err => { if (err.name !== 'AbortError') setFetchError(true) })
+      .finally(() => setIsLoading(false))
+    return () => controller.abort()
   }, [year])
 
   useEffect(() => {
     fetch('/api/years')
-      .then(r => r.json() as Promise<number[]>)
+      .then(r => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`)
+        return r.json() as Promise<number[]>
+      })
       .then(years => setAvailableYears(years.length > 0 ? years : [currentYear]))
       .catch(() => {})
   }, [currentYear])
@@ -48,8 +62,29 @@ function MapView() {
       <Header />
       <main id="main-content" className="flex-1 py-6 px-4 sm:px-6">
         <div className="max-w-lg mx-auto sm:max-w-2xl">
-          <GermanyMap year={year} counts={counts} onCountsChange={setCounts} />
-          <StatsPanel counts={counts} year={year} availableYears={availableYears} onYearChange={setYear} />
+          {fetchError ? (
+            <div className="flex flex-col items-center gap-3 py-16 text-center">
+              <p className="text-gray-600 dark:text-gray-400 text-sm">
+                Daten konnten nicht geladen werden.
+              </p>
+              <button
+                type="button"
+                onClick={() => setYear(y => y)}
+                className="text-sm text-blue-600 dark:text-blue-400 underline"
+              >
+                Erneut versuchen
+              </button>
+            </div>
+          ) : (
+            <>
+              <ErrorBoundary>
+                <GermanyMap year={year} counts={counts} onCountsChange={setCounts} isLoading={isLoading} />
+              </ErrorBoundary>
+              <ErrorBoundary>
+                <StatsPanel counts={counts} year={year} availableYears={availableYears} onYearChange={setYear} isLoading={isLoading} />
+              </ErrorBoundary>
+            </>
+          )}
         </div>
       </main>
       <Footer />

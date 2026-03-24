@@ -6,7 +6,7 @@ export default function Header() {
     >
       <img
         src="/vereinslogo.svg"
-        alt="Vereinslogo"
+        alt="Biber Lieber e.V. Logo"
         className="h-10 w-auto object-contain"
       />
       <div>
@@ -14,7 +14,7 @@ export default function Header() {
           Biberkarte Deutschland
         </h1>
         <p className="text-white/70 text-xs sm:text-sm">
-          Biber Lieber:innen e.V., Berlin
+          Biber Lieber e.V., Berlin
         </p>
       </div>
     </header>

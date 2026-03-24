@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { BUNDESLAENDER } from '../data/bundeslaender'
 import { useIdentity } from '../hooks/useIdentity'
@@ -11,11 +11,19 @@ function getQuantileTier(count: number, sortedCounts: number[]): number {
 }
 
 function loadCooldownUntil(): number {
-  return Number(localStorage.getItem('biber_cooldown_until') ?? 0)
+  try {
+    return Number(localStorage.getItem('biber_cooldown_until') ?? 0)
+  } catch {
+    return 0
+  }
 }
 
 function saveCooldownUntil(unlockMs: number) {
-  localStorage.setItem('biber_cooldown_until', String(unlockMs))
+  try {
+    localStorage.setItem('biber_cooldown_until', String(unlockMs))
+  } catch {
+    // Private browsing or storage quota exceeded — cooldown won't persist
+  }
 }
 
 function formatCountdown(seconds: number): string {
@@ -31,9 +39,10 @@ interface GermanyMapProps {
   year: number
   counts: Map<string, number>
   onCountsChange: (updater: (prev: Map<string, number>) => Map<string, number>) => void
+  isLoading?: boolean
 }
 
-export default function GermanyMap({ year: _year, counts, onCountsChange }: GermanyMapProps) {
+export default function GermanyMap({ year: _year, counts, onCountsChange, isLoading = false }: GermanyMapProps) {
   const [hovered, setHovered] = useState<string | null>(null)
   const [focused, setFocused] = useState<string | null>(null)
   const [touchSelected, setTouchSelected] = useState<string | null>(null)
@@ -44,19 +53,22 @@ export default function GermanyMap({ year: _year, counts, onCountsChange }: Germ
   const [showNicknamePrompt, setShowNicknamePrompt] = useState(false)
   const nicknameRef = useRef<HTMLInputElement>(null)
   const latestPointerType = useRef('mouse')
+  const submittingRef = useRef(false)
 
+  // Only tick while cooldown is active — stops wasting CPU when idle
   useEffect(() => {
-    const id = setInterval(() => setNow(Date.now()), 1000)
+    if (cooldownUntil <= Date.now()) return
+    const id = setInterval(() => {
+      const t = Date.now()
+      setNow(t)
+      if (t >= cooldownUntil) clearInterval(id)
+    }, 1000)
     return () => clearInterval(id)
-  }, [])
+  }, [cooldownUntil])
 
   useEffect(() => {
     if (showNicknamePrompt) nicknameRef.current?.focus()
   }, [showNicknamePrompt])
-
-  function getGlobalCooldownSeconds(): number {
-    return Math.max(0, Math.ceil((cooldownUntil - now) / 1000))
-  }
 
   function handleRegionInteraction(e: React.PointerEvent | React.MouseEvent, code: string) {
     const pointerType = 'pointerType' in e ? (e as React.PointerEvent).pointerType : latestPointerType.current
@@ -72,13 +84,15 @@ export default function GermanyMap({ year: _year, counts, onCountsChange }: Germ
     handleClick(code)
   }
 
-  async function handleClick(code: string) {
+  const handleClick = useCallback(async (code: string) => {
     if (!nickname.trim()) {
       setShowNicknamePrompt(true)
       return
     }
 
-    if (getGlobalCooldownSeconds() > 0) return
+    if (Math.max(0, Math.ceil((cooldownUntil - Date.now()) / 1000)) > 0) return
+    if (submittingRef.current) return
+    submittingRef.current = true
 
     // Optimistic update
     onCountsChange(prev => {
@@ -125,8 +139,11 @@ export default function GermanyMap({ year: _year, counts, onCountsChange }: Germ
         next.set(code, Math.max(0, (next.get(code) ?? 1) - 1))
         return next
       })
+    } finally {
+      submittingRef.current = false
     }
-  }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [nickname, browserId, onCountsChange])
 
   function handleNicknameSave() {
     const trimmed = nicknameInput.trim()
@@ -136,11 +153,15 @@ export default function GermanyMap({ year: _year, counts, onCountsChange }: Germ
     }
   }
 
-  const sortedNonZero = Array.from(counts.values())
-    .filter(c => c > 0)
-    .sort((a, b) => a - b)
+  const sortedNonZero = useMemo(
+    () => Array.from(counts.values()).filter(c => c > 0).sort((a, b) => a - b),
+    [counts]
+  )
 
-  const globalCooldownSeconds = getGlobalCooldownSeconds()
+  const globalCooldownSeconds = useMemo(
+    () => Math.max(0, Math.ceil((cooldownUntil - now) / 1000)),
+    [cooldownUntil, now]
+  )
 
   function getFill(code: string): string {
     if (code === touchSelected || code === hovered) return 'var(--color-land-hover)'
@@ -150,14 +171,25 @@ export default function GermanyMap({ year: _year, counts, onCountsChange }: Germ
     return `var(--color-land-${tier})`
   }
 
+  if (isLoading) {
+    return (
+      <div className="w-full max-w-lg mx-auto" aria-busy="true" aria-label="Karte wird geladen">
+        <div className="animate-pulse">
+          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-48 mb-3" />
+          <div className="bg-gray-100 dark:bg-gray-800 rounded" style={{ aspectRatio: '500/600' }} />
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="w-full max-w-lg mx-auto">
       {/* Nickname bar */}
       <div className="flex items-center gap-2 mb-3 text-sm">
         {nickname && !showNicknamePrompt ? (
           <>
-            <span className="text-gray-600 dark:text-gray-400">Gemeldet als</span>
-            <span className="font-medium text-gray-800 dark:text-gray-200">{nickname}</span>
+            <span className="text-gray-600 dark:text-gray-400 shrink-0">Gemeldet als</span>
+            <span className="font-medium text-gray-800 dark:text-gray-200 truncate max-w-[10rem]" title={nickname}>{nickname}</span>
             <button
               type="button"
               onClick={() => { setNicknameInput(nickname); setShowNicknamePrompt(true) }}
@@ -186,7 +218,8 @@ export default function GermanyMap({ year: _year, counts, onCountsChange }: Germ
               type="button"
               onClick={handleNicknameSave}
               disabled={!nicknameInput.trim()}
-              className="px-2 py-0.5 rounded bg-green-600 text-white text-sm disabled:opacity-40 hover:bg-green-700"
+              className="px-2 py-0.5 rounded text-white text-sm disabled:opacity-40"
+              style={{ backgroundColor: 'var(--brand-primary)' }}
             >
               Speichern
             </button>

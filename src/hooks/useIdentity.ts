@@ -1,21 +1,37 @@
 import { useState } from 'react'
 
+function lsGet(key: string): string | null {
+  try {
+    return localStorage.getItem(key)
+  } catch {
+    return null
+  }
+}
+
+function lsSet(key: string, value: string): void {
+  try {
+    localStorage.setItem(key, value)
+  } catch {
+    // Private browsing or storage quota exceeded — silently ignore
+  }
+}
+
 export function useIdentity() {
   const [browserId] = useState<string>(() => {
-    let id = localStorage.getItem('biber_browser_id')
+    let id = lsGet('biber_browser_id')
     if (!id) {
       id = crypto.randomUUID()
-      localStorage.setItem('biber_browser_id', id)
+      lsSet('biber_browser_id', id)
     }
     return id
   })
 
   const [nickname, setNicknameState] = useState<string>(() => {
-    return localStorage.getItem('biber_nickname') ?? ''
+    return lsGet('biber_nickname') ?? ''
   })
 
   function setNickname(name: string) {
-    localStorage.setItem('biber_nickname', name)
+    lsSet('biber_nickname', name)
     setNicknameState(name)
   }
 

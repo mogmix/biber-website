@@ -165,7 +165,7 @@ No AI slop tells detected. The design is a purposeful, restrained utility app wi
 - **Description:** `alt="Vereinslogo"` describes the asset type, not its content.
 - **Impact:** Screen reader users hear "Vereinslogo image" with no context about whose logo it is.
 - **WCAG:** 1.1.1 Non-text Content (A)
-- **Recommendation:** Change to `alt="Biber Lieber:innen e.V. Logo"` or `alt=""` if purely decorative.
+- **Recommendation:** Change to `alt="Biber Lieber e.V. Logo"` or `alt=""` if purely decorative.
 - **Suggested command:** `/harden`
 
 ---
