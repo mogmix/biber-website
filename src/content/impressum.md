@@ -1,8 +1,6 @@
 # Impressum
 
-**Biber Lieber:innen e.V.**
-[Straße und Hausnummer]
-[PLZ Ort]
+**Biber Lieber e.V.**
 
 ## Vertreten durch
 
@@ -10,12 +8,11 @@
 
 ## Kontakt
 
-E-Mail: [kontakt@verein.de]
-Telefon: [+49 ...]
+E-Mail: <contact@biber-lieberinnen.de>
 
 ## Registereintrag
 
-Eingetragen im Vereinsregister des Amtsgerichts [Stadt]
+Eingetragen im Vereinsregister des Amtsgerichts Berlin
 Registernummer: VR [...]
 
 ## Inhaltlich verantwortlich gemäß § 18 Abs. 2 MStV

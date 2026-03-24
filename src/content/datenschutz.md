@@ -4,10 +4,8 @@
 
 Verantwortlich für die Datenverarbeitung auf dieser Website ist:
 
-**Biber Lieber:innen e.V.**
-[Straße und Hausnummer]
-[PLZ Ort]
-E-Mail: [kontakt@verein.de]
+**Biber Lieber e.V.**
+E-Mail: <contact@biber-lieberinnen.de>
 
 ## 2. Erhobene Daten
 
@@ -42,6 +40,6 @@ Sichtungsmeldungen werden auf unbestimmte Zeit gespeichert, solange sie für den
 
 ## 6. Ihre Rechte
 
-Sie haben das Recht auf Auskunft, Berichtigung, Löschung und Einschränkung der Verarbeitung Ihrer Daten gemäß DSGVO. Wenden Sie sich dazu an: [kontakt@verein.de]
+Sie haben das Recht auf Auskunft, Berichtigung, Löschung und Einschränkung der Verarbeitung Ihrer Daten gemäß DSGVO. Wenden Sie sich dazu an: <contact@biber-lieberinnen.de>
 
 Sie haben zudem das Recht, sich bei der zuständigen Datenschutzaufsichtsbehörde zu beschweren.
