@@ -33,6 +33,12 @@ async function ensureSchema(env: Env): Promise<void> {
       reported_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
   `);
+  // Migration: drop nickname column if it exists from old schema
+  try {
+    await db.execute(`ALTER TABLE sightings DROP COLUMN nickname`);
+  } catch {
+    // Column doesn't exist — nothing to do
+  }
 }
 
 async function handleGetSightings(request: Request, env: Env): Promise<Response> {
@@ -101,7 +107,7 @@ async function handlePostSighting(request: Request, env: Env): Promise<Response>
   if (recent.rows.length > 0) {
     const reportedAt = recent.rows[0].reported_at as string;
     const reportedMs = new Date(reportedAt + "Z").getTime();
-    const unlockMs = reportedMs + 3 * 60 * 60 * 1000;
+    const unlockMs = reportedMs + 15 * 60 * 1000;
     const retryAfterSeconds = Math.ceil((unlockMs - Date.now()) / 1000);
     return json({ retry_after_seconds: Math.max(retryAfterSeconds, 1) }, 429);
   }
