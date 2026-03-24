@@ -36,16 +36,22 @@ function renderMarkdown(md: string) {
 export default function LegalPage({ content }: Props) {
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 flex flex-col">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:px-4 focus:py-2 focus:bg-white focus:text-gray-900 focus:rounded focus:shadow"
+      >
+        Zum Hauptinhalt springen
+      </a>
       <Header />
-      <main className="flex-1 py-8 px-4 sm:px-6">
+      <main id="main-content" className="flex-1 py-8 px-4 sm:px-6">
         <div className="max-w-2xl mx-auto">
-          <button
-            type="button"
-            onClick={() => navigate('/')}
+          <a
+            href="/"
+            onClick={(e) => { e.preventDefault(); navigate('/') }}
             className="mb-6 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 flex items-center gap-1"
           >
             ← Zurück zur Karte
-          </button>
+          </a>
           <div className="prose-sm space-y-3">
             {renderMarkdown(content)}
           </div>

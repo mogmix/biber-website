@@ -52,9 +52,10 @@ const StatsPanel = memo(function StatsPanel({ counts, year, availableYears, onYe
               className="flex-1 bg-gray-100 dark:bg-gray-700 rounded overflow-hidden h-4 sm:h-5"
             >
               <div
-                className="h-full rounded transition-[width] duration-300 ease-out"
+                className="h-full rounded transition-transform duration-300 ease-out origin-left"
                 style={{
-                  width: count > 0 ? `${(count / maxCount) * 100}%` : '0%',
+                  width: '100%',
+                  transform: `scaleX(${count > 0 ? count / maxCount : 0})`,
                   backgroundColor: 'var(--color-land-3)',
                 }}
               />

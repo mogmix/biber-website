@@ -6,7 +6,7 @@ Work through these in order. Check off each item when done.
 
 ## Immediate
 
-- [ ] **[C1] Fix navigation: replace `<button>` with `<a href>`**
+- [x] **[C1] Fix navigation: replace `<button>` with `<a href>`**
   Footer links (Impressum, Datenschutz) and LegalPage back button should be anchor elements.
   `src/components/Footer.tsx`, `src/components/LegalPage.tsx`
 
@@ -42,7 +42,7 @@ Work through these in order. Check off each item when done.
   `setInterval` fires every second unconditionally. Only start it when cooldown is active; clear it when it reaches 0.
   `src/components/GermanyMap.tsx:48–51`
 
-- [ ] **[M3] Animate progress bars with `scaleX` instead of `width`**
+- [x] **[M3] Animate progress bars with `scaleX` instead of `width`**
   `transition-[width]` triggers layout recalculation. Use `transform: scaleX()` + `transition-transform`.
   `src/components/StatsPanel.tsx:49`
 
@@ -54,7 +54,7 @@ Work through these in order. Check off each item when done.
   `alt="Vereinslogo"` → `alt="Biber Lieber e.V. Logo"`.
   `src/components/Header.tsx:9`
 
-- [ ] **[M6] Add skip-to-main-content link on legal pages**
+- [x] **[M6] Add skip-to-main-content link on legal pages**
   `MapView` has one; `LegalPage` doesn't. Add `id="main-content"` to `<main>` and the skip link.
   `src/components/LegalPage.tsx`
 
