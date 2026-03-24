@@ -9,6 +9,25 @@ interface StatsPanelProps {
   isLoading?: boolean
 }
 
+const TIER_COLORS = [
+  'var(--color-land-5)',
+  'var(--color-land-5)',
+  'var(--color-land-5)',
+  'var(--color-land-4)',
+  'var(--color-land-4)',
+  'var(--color-land-4)',
+  'var(--color-land-3)',
+  'var(--color-land-3)',
+  'var(--color-land-3)',
+  'var(--color-land-3)',
+  'var(--color-land-2)',
+  'var(--color-land-2)',
+  'var(--color-land-2)',
+  'var(--color-land-1)',
+  'var(--color-land-1)',
+  'var(--color-land-1)',
+]
+
 const StatsPanel = memo(function StatsPanel({ counts, year, availableYears, onYearChange, isLoading = false }: StatsPanelProps) {
   const sorted = useMemo(
     () =>
@@ -23,7 +42,7 @@ const StatsPanel = memo(function StatsPanel({ counts, year, availableYears, onYe
   return (
     <div className="w-full mt-8">
       <div className="flex items-center justify-between mb-3">
-        <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300">Statistik</h2>
+        <h2 className="text-base font-bold text-gray-800 dark:text-gray-100">Statistik</h2>
         <div className="flex items-center gap-2 text-sm">
           <label htmlFor="year-select" className="text-gray-600 dark:text-gray-400">Jahr:</label>
           <select
@@ -48,7 +67,7 @@ const StatsPanel = memo(function StatsPanel({ counts, year, availableYears, onYe
               <div className="w-6 sm:w-8 shrink-0 h-3 bg-gray-200 dark:bg-gray-700 rounded" />
             </div>
           ))
-        ) : sorted.map(({ code, name, count }) => (
+        ) : sorted.map(({ code, name, count }, index) => (
           <div key={code} role="listitem" className="flex items-center gap-2 text-xs sm:text-sm">
             <span className="w-28 sm:w-36 shrink-0 text-right text-gray-600 dark:text-gray-400 truncate" aria-hidden="true">{name}</span>
             <div
@@ -64,7 +83,7 @@ const StatsPanel = memo(function StatsPanel({ counts, year, availableYears, onYe
                 style={{
                   width: '100%',
                   transform: `scaleX(${count > 0 ? count / maxCount : 0})`,
-                  backgroundColor: 'var(--color-land-3)',
+                  backgroundColor: count > 0 ? TIER_COLORS[index] : 'transparent',
                 }}
               />
             </div>
@@ -73,7 +92,6 @@ const StatsPanel = memo(function StatsPanel({ counts, year, availableYears, onYe
         ))}
       </div>
 
-      <p className="text-xs text-gray-600 dark:text-gray-500 mt-2 text-right">Sichtungen</p>
     </div>
   )
 })
