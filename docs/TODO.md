@@ -22,8 +22,8 @@ Human-in-the-loop checklist. Work through these steps in order.
 
 ## 4. Smoke Test
 
-- [ ] Submit at least one sighting on the production URL
-- [ ] Confirm the sighting appears on the map and in the statistics panel
+- [x] Submit at least one sighting on the production URL
+- [x] Confirm the sighting appears on the map and in the statistics panel
 
 ## 5. Secure Turso Credentials
 
@@ -32,7 +32,7 @@ Human-in-the-loop checklist. Work through these steps in order.
 
 ## 6. README
 
-- [ ] Write `README.md` covering:
+- [x] Write `README.md` covering:
   - What the project is
   - How to run it locally (`npm install` / `npm run dev`)
   - How to redeploy (push to `main`)

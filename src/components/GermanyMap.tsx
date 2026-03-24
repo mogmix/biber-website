@@ -47,6 +47,9 @@ export default function GermanyMap({ year: _year, counts, onCountsChange, isLoad
   const [focused, setFocused] = useState<string | null>(null)
   const [touchSelected, setTouchSelected] = useState<string | null>(null)
   const [cooldownUntil, setCooldownUntil] = useState<number>(loadCooldownUntil)
+  const [flashCode, setFlashCode] = useState<string | null>(null)
+  const [toastLand, setToastLand] = useState<{ name: string; key: number } | null>(null)
+  const toastCounterRef = useRef(0)
   const [now, setNow] = useState(Date.now())
   const { browserId, nickname, setNickname } = useIdentity()
   const [nicknameInput, setNicknameInput] = useState(nickname)
@@ -127,10 +130,16 @@ export default function GermanyMap({ year: _year, counts, onCountsChange, isLoad
           return next
         })
       } else {
-        // Success — block entire map for 3 hours
-        const unlockMs = Date.now() + 3 * 60 * 60 * 1000
+        // Success — block entire map for 3 hours (set to 5s for debug)
+        const unlockMs = Date.now() + 5 * 1000
         setCooldownUntil(unlockMs)
         saveCooldownUntil(unlockMs)
+        // Delight: flash the region and show a toast
+        const landName = BUNDESLAENDER.find(b => b.code === code)?.name ?? code
+        setFlashCode(code)
+        setToastLand({ name: landName, key: ++toastCounterRef.current })
+        setTimeout(() => setFlashCode(null), 120)
+        setTimeout(() => setToastLand(null), 2800)
       }
     } catch {
       // Network error — revert optimistic update
@@ -164,6 +173,7 @@ export default function GermanyMap({ year: _year, counts, onCountsChange, isLoad
   )
 
   function getFill(code: string): string {
+    if (flashCode === code) return '#5eead4'
     const isActive = code === touchSelected || code === hovered
     if (isActive) return globalCooldownSeconds > 0 ? 'var(--color-land-cooldown)' : 'var(--color-land-hover)'
     const count = counts.get(code) ?? 0
@@ -184,7 +194,7 @@ export default function GermanyMap({ year: _year, counts, onCountsChange, isLoad
   }
 
   return (
-    <div className="w-full max-w-lg mx-auto">
+    <div className="w-full max-w-lg mx-auto relative">
       {/* Nickname bar */}
       <div className="flex items-center gap-2 mb-3 text-sm">
         {nickname && !showNicknamePrompt ? (
@@ -239,6 +249,18 @@ export default function GermanyMap({ year: _year, counts, onCountsChange, isLoad
           : ''}
       </div>
 
+      {toastLand && (
+        <div
+          key={toastLand.key}
+          role="status"
+          aria-live="polite"
+          className="sighting-toast pointer-events-none absolute bottom-4 left-1/2 z-10 whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium text-white shadow-lg"
+          style={{ backgroundColor: 'var(--brand-primary)' }}
+        >
+          🦫 Sichtung in {toastLand.name} gemeldet!
+        </div>
+      )}
+
       <Tooltip.Provider delayDuration={100}>
         <svg
           viewBox="0 0 500 600"
@@ -290,7 +312,7 @@ export default function GermanyMap({ year: _year, counts, onCountsChange, isLoad
                         fill: getFill(code),
                         stroke: isFocused ? 'var(--color-focus)' : 'var(--color-land-stroke)',
                         strokeWidth: isFocused ? 2 : 1,
-                        transition: 'fill 150ms ease-out',
+                        transition: flashCode === code ? 'fill 0ms' : 'fill 600ms ease-out',
                       }}
                     />
                   </g>

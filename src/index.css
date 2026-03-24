@@ -40,3 +40,21 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+@keyframes sighting-toast {
+  0%   { opacity: 0; transform: translateY(8px) translateX(-50%); }
+  12%  { opacity: 1; transform: translateY(0)   translateX(-50%); }
+  72%  { opacity: 1; transform: translateY(0)   translateX(-50%); }
+  100% { opacity: 0; transform: translateY(0)   translateX(-50%); }
+}
+
+.sighting-toast {
+  animation: sighting-toast 2.8s ease forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sighting-toast {
+    animation: none;
+    opacity: 0;
+  }
+}
