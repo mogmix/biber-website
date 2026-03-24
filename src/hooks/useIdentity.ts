@@ -26,14 +26,5 @@ export function useIdentity() {
     return id
   })
 
-  const [nickname, setNicknameState] = useState<string>(() => {
-    return lsGet('biber_nickname') ?? ''
-  })
-
-  function setNickname(name: string) {
-    lsSet('biber_nickname', name)
-    setNicknameState(name)
-  }
-
-  return { browserId, nickname, setNickname }
+  return { browserId }
 }

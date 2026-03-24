@@ -68,7 +68,7 @@ An interactive map of Germany at the Bundesland level for reporting and visualis
 |---|---|---|
 | M-01 | SVG map of 16 Bundesländer, each a clickable region | Public-domain SVG, embedded in React |
 | M-02 | Hover state: region highlights + tooltip shows name and current-year sighting count | Radix Tooltip or CSS-only on mobile |
-| M-03 | Click on a Bundesland → submits a sighting | Writes: Bundesland, timestamp, nickname (from `localStorage`) |
+| M-03 | Click on a Bundesland → submits a sighting | Writes: Bundesland, timestamp, browser_id |
 | M-04 | Rate limit: max 1 sighting per browser per 3 hours | Enforced server-side (Turso timestamp check on `browser_id` alone) + client `localStorage` for instant UI feedback. On rate-limit hit, the map continues to display the normal green choropleth; the user learns they are blocked via the hover tooltip, which shows the remaining cooldown. No full-map disable or red overlay. |
 | M-05 | Choropleth colouring: regions shaded by sighting density (light → dark green) | Recalculated on page load from current-year data |
 | M-06 | Statistics panel below the map: bar chart of sightings per Bundesland (current year) | Lightweight chart — CSS-only bars or a minimal library (e.g. `chart.js` subset via CDN if needed) |
@@ -116,7 +116,7 @@ sightings
 ─────────
 id            TEXT PRIMARY KEY (ULID or nanoid)
 bundesland    TEXT NOT NULL   -- e.g. "BE", "BY", "NW" (ISO 3166-2:DE)
-nickname      TEXT           -- self-chosen, from localStorage
+browser_id    TEXT NOT NULL   -- random UUID, persisted in localStorage
 reported_at   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 ```
 
@@ -129,8 +129,8 @@ upvotes_log     -- per-item vote deduplication
 
 ### Notes on identity
 
-- There is no `users` table. "Identity" is a self-chosen nickname + a random `browser_id` generated on first visit and persisted in `localStorage`.
-- This is intentionally weak identity. It's sufficient for sighting attribution among 10 trusted people. It is **not** a security boundary.
+- There is no `users` table. Identity is a random `browser_id` generated on first visit and persisted in `localStorage`.
+- This is intentionally weak identity. It's sufficient for rate-limiting among trusted people. It is **not** a security boundary.
 
 ---
 

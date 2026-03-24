@@ -51,10 +51,7 @@ export default function GermanyMap({ year: _year, counts, onCountsChange, isLoad
   const [toastLand, setToastLand] = useState<{ name: string; key: number } | null>(null)
   const toastCounterRef = useRef(0)
   const [now, setNow] = useState(Date.now())
-  const { browserId, nickname, setNickname } = useIdentity()
-  const [nicknameInput, setNicknameInput] = useState(nickname)
-  const [showNicknamePrompt, setShowNicknamePrompt] = useState(false)
-  const nicknameRef = useRef<HTMLInputElement>(null)
+  const { browserId } = useIdentity()
   const latestPointerType = useRef('mouse')
   const submittingRef = useRef(false)
 
@@ -68,10 +65,6 @@ export default function GermanyMap({ year: _year, counts, onCountsChange, isLoad
     }, 1000)
     return () => clearInterval(id)
   }, [cooldownUntil])
-
-  useEffect(() => {
-    if (showNicknamePrompt) nicknameRef.current?.focus()
-  }, [showNicknamePrompt])
 
   function handleRegionInteraction(e: React.PointerEvent | React.MouseEvent, code: string) {
     const pointerType = 'pointerType' in e ? (e as React.PointerEvent).pointerType : latestPointerType.current
@@ -88,11 +81,6 @@ export default function GermanyMap({ year: _year, counts, onCountsChange, isLoad
   }
 
   const handleClick = useCallback(async (code: string) => {
-    if (!nickname.trim()) {
-      setShowNicknamePrompt(true)
-      return
-    }
-
     if (Math.max(0, Math.ceil((cooldownUntil - Date.now()) / 1000)) > 0) return
     if (submittingRef.current) return
     submittingRef.current = true
@@ -108,7 +96,7 @@ export default function GermanyMap({ year: _year, counts, onCountsChange, isLoad
       const res = await fetch('/api/sightings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ bundesland: code, nickname: nickname.trim(), browser_id: browserId }),
+        body: JSON.stringify({ bundesland: code, browser_id: browserId }),
       })
 
       if (res.status === 429) {
@@ -152,15 +140,7 @@ export default function GermanyMap({ year: _year, counts, onCountsChange, isLoad
       submittingRef.current = false
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [nickname, browserId, onCountsChange])
-
-  function handleNicknameSave() {
-    const trimmed = nicknameInput.trim()
-    if (trimmed) {
-      setNickname(trimmed)
-      setShowNicknamePrompt(false)
-    }
-  }
+  }, [browserId, onCountsChange])
 
   const sortedNonZero = useMemo(
     () => Array.from(counts.values()).filter(c => c > 0).sort((a, b) => a - b),
@@ -195,49 +175,6 @@ export default function GermanyMap({ year: _year, counts, onCountsChange, isLoad
 
   return (
     <div className="w-full max-w-lg mx-auto relative">
-      {/* Nickname bar */}
-      <div className="flex items-center gap-2 mb-3 text-sm">
-        {nickname && !showNicknamePrompt ? (
-          <>
-            <span className="text-gray-600 dark:text-gray-400 shrink-0">Gemeldet als</span>
-            <span className="font-medium text-gray-800 dark:text-gray-200 truncate max-w-[10rem]" title={nickname}>{nickname}</span>
-            <button
-              type="button"
-              onClick={() => { setNicknameInput(nickname); setShowNicknamePrompt(true) }}
-              className="text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 underline py-2 px-1 min-h-[44px]"
-            >
-              ändern
-            </button>
-          </>
-        ) : (
-          <>
-            <label htmlFor="nickname-input" className="text-gray-600 dark:text-gray-400 shrink-0">
-              Dein Name:
-            </label>
-            <input
-              id="nickname-input"
-              ref={nicknameRef}
-              type="text"
-              value={nicknameInput}
-              onChange={e => setNicknameInput(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && handleNicknameSave()}
-              placeholder="Spitzname eingeben…"
-              maxLength={40}
-              className="border border-gray-300 dark:border-gray-600 rounded px-2 py-2 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 flex-1 min-w-0 min-h-[44px]"
-            />
-            <button
-              type="button"
-              onClick={handleNicknameSave}
-              disabled={!nicknameInput.trim()}
-              className="px-3 py-2 rounded text-white text-sm disabled:opacity-40 min-h-[44px]"
-              style={{ backgroundColor: 'var(--brand-primary)' }}
-            >
-              Speichern
-            </button>
-          </>
-        )}
-      </div>
-
       <div
         role="status"
         aria-live="polite"

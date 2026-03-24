@@ -29,7 +29,6 @@ async function ensureSchema(env: Env): Promise<void> {
     CREATE TABLE IF NOT EXISTS sightings (
       id TEXT PRIMARY KEY,
       bundesland TEXT NOT NULL,
-      nickname TEXT NOT NULL,
       browser_id TEXT NOT NULL,
       reported_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
@@ -75,16 +74,16 @@ async function handleGetYears(env: Env): Promise<Response> {
 }
 
 async function handlePostSighting(request: Request, env: Env): Promise<Response> {
-  let body: { bundesland?: string; nickname?: string; browser_id?: string };
+  let body: { bundesland?: string; browser_id?: string };
   try {
     body = await request.json();
   } catch {
     return json({ error: "Invalid JSON" }, 400);
   }
 
-  const { bundesland, nickname, browser_id } = body;
-  if (!bundesland || !nickname || !browser_id) {
-    return json({ error: "bundesland, nickname, and browser_id are required" }, 400);
+  const { bundesland, browser_id } = body;
+  if (!bundesland || !browser_id) {
+    return json({ error: "bundesland and browser_id are required" }, 400);
   }
 
   const db = getDb(env);
@@ -109,11 +108,11 @@ async function handlePostSighting(request: Request, env: Env): Promise<Response>
 
   const id = crypto.randomUUID();
   await db.execute({
-    sql: `INSERT INTO sightings (id, bundesland, nickname, browser_id) VALUES (?, ?, ?, ?)`,
-    args: [id, bundesland, nickname, browser_id],
+    sql: `INSERT INTO sightings (id, bundesland, browser_id) VALUES (?, ?, ?)`,
+    args: [id, bundesland, browser_id],
   });
 
-  return json({ id, bundesland, nickname }, 201);
+  return json({ id, bundesland }, 201);
 }
 
 export default {

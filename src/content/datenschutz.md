@@ -16,7 +16,6 @@ Beim Nutzen dieser Website werden folgende Daten verarbeitet:
 Wenn Sie eine Bibersichtung melden, speichern wir:
 
 - das Bundesland der Sichtung
-- einen von Ihnen gewählten Spitznamen
 - eine anonyme Browser-ID (zur Missbrauchsverhütung)
 - Datum und Uhrzeit der Meldung
 
