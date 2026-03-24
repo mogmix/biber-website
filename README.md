@@ -1,73 +1,58 @@
-# React + TypeScript + Vite
+# Biber Website
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A beaver sighting tracker for the Verein. Members report sightings by clicking on a map of Germany's 16 Bundesländer. Sightings are stored in a database and shown as a colour-coded map and bar chart, filterable by year.
 
-Currently, two official plugins are available:
+Built with React + Vite on the frontend, a Cloudflare Worker for the API, and Turso (managed SQLite) as the database.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+---
 
-## React Compiler
+## Running locally
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+You'll need Node.js and the Turso credentials (ask the admin).
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Create a `.dev.vars` file in the project root:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+```
+DATABASE_URL=libsql://...
+AUTH_TOKEN=...
+```
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+Then start the dev server:
+
+```bash
+npm run dev
+```
+
+---
+
+## Deploying
+
+Push to `main`. Cloudflare Pages picks it up automatically and deploys within a minute or two.
+
+---
+
+## Querying the database
+
+Install the [Turso CLI](https://docs.turso.tech/cli/installation), then:
+
+```bash
+turso db shell <db-name>
+```
+
+Useful queries:
+
+```sql
+-- Most recent sightings
+SELECT * FROM sightings ORDER BY reported_at DESC LIMIT 20;
+
+-- Count by Bundesland for a given year
+SELECT bundesland, COUNT(*) AS total
+FROM sightings
+WHERE strftime('%Y', reported_at) = '2026'
+GROUP BY bundesland
+ORDER BY total DESC;
 ```
