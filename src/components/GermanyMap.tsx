@@ -22,9 +22,9 @@ function formatCountdown(seconds: number): string {
   const h = Math.floor(seconds / 3600)
   const m = Math.floor((seconds % 3600) / 60)
   const s = seconds % 60
-  if (h > 0) return `${h}h ${m}m`
-  if (m > 0) return `${m}m ${s}s`
-  return `${s}s`
+  if (h > 0) return `${h} h ${m} min`
+  if (m > 0) return `${m} min ${s} s`
+  return `${s} s`
 }
 
 interface GermanyMapProps {
@@ -143,7 +143,6 @@ export default function GermanyMap({ year: _year, counts, onCountsChange }: Germ
   const globalCooldownSeconds = getGlobalCooldownSeconds()
 
   function getFill(code: string): string {
-    if (globalCooldownSeconds > 0) return 'var(--color-land-cooldown)'
     if (code === touchSelected || code === hovered) return 'var(--color-land-hover)'
     const count = counts.get(code) ?? 0
     if (count === 0) return 'var(--color-land-default)'
@@ -247,7 +246,7 @@ export default function GermanyMap({ year: _year, counts, onCountsChange }: Germ
                     }}
                     onFocus={() => { setFocused(code); setHovered(code) }}
                     onBlur={() => { setFocused(null); setHovered(null) }}
-                    style={{ cursor: globalCooldownSeconds > 0 ? 'not-allowed' : 'pointer' }}
+                    style={{ cursor: 'pointer' }}
                     className="focus:outline-none"
                   >
                     <path
@@ -271,8 +270,8 @@ export default function GermanyMap({ year: _year, counts, onCountsChange }: Germ
                       {count} {count === 1 ? 'Sichtung' : 'Sichtungen'}
                     </span>
                     {globalCooldownSeconds > 0 && (
-                      <span className="block text-red-500 text-xs mt-0.5">
-                        Wieder in {formatCountdown(globalCooldownSeconds)}
+                      <span className="block text-gray-500 dark:text-gray-400 text-xs mt-0.5">
+                        Nächste Sichtung in {formatCountdown(globalCooldownSeconds)} möglich
                       </span>
                     )}
                     <Tooltip.Arrow className="fill-white dark:fill-gray-800" />
