@@ -5,6 +5,9 @@
   --brand-primary: #105244;
   --brand-primary-dark: #0b3a30;
 
+  /* Focus colour */
+  --color-focus: #3b82f6;
+
   /* Map colours */
   --color-land-default: #d1d5db;
   --color-land-stroke: #9ca3af;
@@ -22,6 +25,12 @@
     --color-land-default: #374151;
     --color-land-stroke: #4b5563;
     --color-land-hover: #4b5563;
+    --color-land-cooldown: #7f1d1d;
+    --color-land-1: #1a3b35;
+    --color-land-2: #1e5c4e;
+    --color-land-3: #1e7a62;
+    --color-land-4: #148060;
+    --color-land-5: #0d6b4f;
   }
 }
 
@@ -29,4 +38,5 @@ body {
   margin: 0;
   font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }

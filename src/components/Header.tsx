@@ -7,7 +7,7 @@ export default function Header() {
       <img
         src="/vereinslogo.svg"
         alt="Biber Lieber e.V. Logo"
-        className="h-10 w-auto object-contain"
+        className="h-10 w-auto object-contain shrink-0"
       />
       <div>
         <h1 className="text-white font-bold text-lg sm:text-xl leading-tight">

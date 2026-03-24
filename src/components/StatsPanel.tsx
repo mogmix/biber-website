@@ -40,7 +40,15 @@ const StatsPanel = memo(function StatsPanel({ counts, year, availableYears, onYe
       </div>
 
       <div className="space-y-1.5" role="list" aria-label="Sichtungen nach Bundesland" aria-busy={isLoading}>
-        {sorted.map(({ code, name, count }) => (
+        {isLoading ? (
+          Array.from({ length: 16 }, (_, i) => (
+            <div key={i} className="flex items-center gap-2 animate-pulse">
+              <div className="w-28 sm:w-36 shrink-0 h-3 bg-gray-200 dark:bg-gray-700 rounded ml-auto" />
+              <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded h-4 sm:h-5" style={{ width: `${30 + Math.floor((i * 37 + 17) % 70)}%` }} />
+              <div className="w-6 sm:w-8 shrink-0 h-3 bg-gray-200 dark:bg-gray-700 rounded" />
+            </div>
+          ))
+        ) : sorted.map(({ code, name, count }) => (
           <div key={code} role="listitem" className="flex items-center gap-2 text-xs sm:text-sm">
             <span className="w-28 sm:w-36 shrink-0 text-right text-gray-600 dark:text-gray-400 truncate" aria-hidden="true">{name}</span>
             <div

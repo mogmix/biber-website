@@ -164,7 +164,8 @@ export default function GermanyMap({ year: _year, counts, onCountsChange, isLoad
   )
 
   function getFill(code: string): string {
-    if (code === touchSelected || code === hovered) return 'var(--color-land-hover)'
+    const isActive = code === touchSelected || code === hovered
+    if (isActive) return globalCooldownSeconds > 0 ? 'var(--color-land-cooldown)' : 'var(--color-land-hover)'
     const count = counts.get(code) ?? 0
     if (count === 0) return 'var(--color-land-default)'
     const tier = getQuantileTier(count, sortedNonZero)
@@ -193,7 +194,7 @@ export default function GermanyMap({ year: _year, counts, onCountsChange, isLoad
             <button
               type="button"
               onClick={() => { setNicknameInput(nickname); setShowNicknamePrompt(true) }}
-              className="text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 underline"
+              className="text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 underline py-2 px-1 min-h-[44px]"
             >
               ändern
             </button>
@@ -212,13 +213,13 @@ export default function GermanyMap({ year: _year, counts, onCountsChange, isLoad
               onKeyDown={e => e.key === 'Enter' && handleNicknameSave()}
               placeholder="Spitzname eingeben…"
               maxLength={40}
-              className="border border-gray-300 dark:border-gray-600 rounded px-2 py-0.5 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 flex-1 min-w-0"
+              className="border border-gray-300 dark:border-gray-600 rounded px-2 py-2 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 flex-1 min-w-0 min-h-[44px]"
             />
             <button
               type="button"
               onClick={handleNicknameSave}
               disabled={!nicknameInput.trim()}
-              className="px-2 py-0.5 rounded text-white text-sm disabled:opacity-40"
+              className="px-3 py-2 rounded text-white text-sm disabled:opacity-40 min-h-[44px]"
               style={{ backgroundColor: 'var(--brand-primary)' }}
             >
               Speichern
@@ -287,8 +288,9 @@ export default function GermanyMap({ year: _year, counts, onCountsChange, isLoad
                       d={d}
                       style={{
                         fill: getFill(code),
-                        stroke: isFocused ? '#3b82f6' : 'var(--color-land-stroke)',
+                        stroke: isFocused ? 'var(--color-focus)' : 'var(--color-land-stroke)',
                         strokeWidth: isFocused ? 2 : 1,
+                        transition: 'fill 150ms ease-out',
                       }}
                     />
                   </g>

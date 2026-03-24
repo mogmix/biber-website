@@ -21,6 +21,7 @@ function MapView() {
   const [availableYears, setAvailableYears] = useState<number[]>([currentYear])
   const [isLoading, setIsLoading] = useState(true)
   const [fetchError, setFetchError] = useState(false)
+  const [retryCount, setRetryCount] = useState(0)
 
   useEffect(() => {
     const controller = new AbortController()
@@ -39,7 +40,7 @@ function MapView() {
       .catch(err => { if (err.name !== 'AbortError') setFetchError(true) })
       .finally(() => setIsLoading(false))
     return () => controller.abort()
-  }, [year])
+  }, [year, retryCount])
 
   useEffect(() => {
     fetch('/api/years')
@@ -69,7 +70,7 @@ function MapView() {
               </p>
               <button
                 type="button"
-                onClick={() => setYear(y => y)}
+                onClick={() => setRetryCount(n => n + 1)}
                 className="text-sm text-blue-600 dark:text-blue-400 underline"
               >
                 Erneut versuchen
