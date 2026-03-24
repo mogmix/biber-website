@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { BUNDESLAENDER } from '../data/bundeslaender'
 import { useIdentity } from '../hooks/useIdentity'
 
@@ -118,8 +118,8 @@ export default function GermanyMap({ year: _year, counts, onCountsChange, isLoad
           return next
         })
       } else {
-        // Success — block entire map for 3 hours (set to 5s for debug)
-        const unlockMs = Date.now() + 5 * 1000
+        // Success — block entire map for 15 minutes
+        const unlockMs = Date.now() + 60 * 15 * 1000
         setCooldownUntil(unlockMs)
         saveCooldownUntil(unlockMs)
         // Delight: flash the region and show a toast

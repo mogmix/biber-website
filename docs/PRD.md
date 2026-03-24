@@ -3,7 +3,7 @@
 
 **Verein:** Biber Lieber e.V., Berlin
 **Version:** 1.0 — MVP (revised)
-**Datum:** 22. März 2026
+**Datum:** 24. März 2026
 **Autor:** Morgan Tranter
 
 ---
@@ -69,7 +69,7 @@ An interactive map of Germany at the Bundesland level for reporting and visualis
 | M-01 | SVG map of 16 Bundesländer, each a clickable region | Public-domain SVG, embedded in React |
 | M-02 | Hover state: region highlights + tooltip shows name and current-year sighting count | Radix Tooltip or CSS-only on mobile |
 | M-03 | Click on a Bundesland → submits a sighting | Writes: Bundesland, timestamp, browser_id |
-| M-04 | Rate limit: max 1 sighting per browser per 3 hours | Enforced server-side (Turso timestamp check on `browser_id` alone) + client `localStorage` for instant UI feedback. On rate-limit hit, the map continues to display the normal green choropleth; the user learns they are blocked via the hover tooltip, which shows the remaining cooldown. No full-map disable or red overlay. |
+| M-04 | Rate limit: max 1 sighting per browser per 15 minutes | Enforced server-side (Turso timestamp check on `browser_id` alone) + client `localStorage` for instant UI feedback. On rate-limit hit, the map continues to display the normal green choropleth; the user learns they are blocked via the hover tooltip, which shows the remaining cooldown. No full-map disable or red overlay. |
 | M-05 | Choropleth colouring: regions shaded by sighting density (light → dark green) | Recalculated on page load from current-year data |
 | M-06 | Statistics panel below the map: bar chart of sightings per Bundesland (current year) | Lightweight chart — CSS-only bars or a minimal library (e.g. `chart.js` subset via CDN if needed) |
 | M-07 | Year filter dropdown to switch statistics between years | Only years with data are shown |
@@ -142,11 +142,11 @@ The frontend communicates with a thin API layer deployed as a Cloudflare Pages F
 
 ```
 GET    /api/sightings?year=2026         → sightings aggregated by Bundesland
-POST   /api/sightings                   → report a sighting (bundesland, nickname, browser_id)
+POST   /api/sightings                   → report a sighting (bundesland, browser_id)
          → 429 if rate-limited (response includes retry_after_seconds)
 ```
 
-All endpoints are unauthenticated. Rate limiting on `POST /api/sightings` is enforced by checking the most recent sighting for the same `browser_id` within the past 3 hours, regardless of Bundesland. Any successful submission blocks the entire map for that browser for 3 hours.
+All endpoints are unauthenticated. Rate limiting on `POST /api/sightings` is enforced by checking the most recent sighting for the same `browser_id` within the past 15 minutes, regardless of Bundesland. Any successful submission blocks the entire map for that browser for 15 minutes.
 
 ### Endpoints deferred to v1.1
 
@@ -178,7 +178,7 @@ POST   /api/feed/:id/upvote             → upvote
 | Performance | Initial load < 2 s on 4G; map interactions < 100 ms (SVG, no tile loading) |
 | Browser support | Latest 2 versions of Chrome, Firefox, Safari, Edge |
 | Accessibility | WCAG 2.1 Level AA (contrast, keyboard nav, focus management) |
-| Privacy | No analytics, no cookies beyond the functional `localStorage` items (browser_id, nickname, theme preference). No personal data is collected. DSGVO-compliant by design — there is nothing to process |
+| Privacy | No analytics, no cookies beyond the functional `localStorage` items (browser_id, theme preference). No personal data is collected. DSGVO-compliant by design — there is nothing to process |
 | Data residency | All data stored in EU (Cloudflare Frankfurt, Turso EU region) |
 | Resilience | Static SPA remains functional even if the API is temporarily unreachable (map renders with cached or empty data) |
 
@@ -201,7 +201,7 @@ POST   /api/feed/:id/upvote             → upvote
 | Risk | Likelihood | Impact | Mitigation |
 |---|---|---|---|
 | Turso free tier is deprecated or limited | Low | Medium | Data volume is tiny; migration to another SQLite host (Fly.io, Cloudflare D1) is straightforward |
-| `localStorage`-based identity is lost (cleared browser, new device) | High | Low | Acceptable at this scale. User just picks a new nickname |
+| `localStorage`-based identity is lost (cleared browser, new device) | High | Low | Acceptable at this scale. A new `browser_id` is generated automatically on next visit |
 | SVG map rendering issues on older mobile browsers | Low | Medium | Test early on real devices in week 1. The SVG is simple enough to be universally supported |
 | Scope creep toward v1.1/v2 features during build | Medium | Medium | This PRD is the scope contract. Any feature not listed in Section 5 requires a conscious decision to revise the PRD first |
 
