@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import GermanyMap from './components/GermanyMap'
 import StatsPanel from './components/StatsPanel'
+import Header from './components/Header'
 
 interface SightingCount {
   bundesland: string
@@ -32,11 +33,14 @@ export default function App() {
   }, [currentYear])
 
   return (
-    <main className="min-h-screen bg-white dark:bg-gray-900 py-8 px-4">
-      <div className="max-w-lg mx-auto">
-        <GermanyMap year={year} counts={counts} onCountsChange={setCounts} />
-        <StatsPanel counts={counts} year={year} availableYears={availableYears} onYearChange={setYear} />
-      </div>
-    </main>
+    <div className="min-h-screen bg-white dark:bg-gray-900">
+      <Header />
+      <main className="py-6 px-4 sm:px-6">
+        <div className="max-w-lg mx-auto sm:max-w-2xl">
+          <GermanyMap year={year} counts={counts} onCountsChange={setCounts} />
+          <StatsPanel counts={counts} year={year} availableYears={availableYears} onYearChange={setYear} />
+        </div>
+      </main>
+    </div>
   )
 }

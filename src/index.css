@@ -1,16 +1,20 @@
 @import "tailwindcss";
 
 :root {
+  /* Brand colours — swap these hex values when the Verein supplies final assets */
+  --brand-primary: #105244;
+  --brand-primary-dark: #0b3a30;
+
   /* Map colours */
   --color-land-default: #d1d5db;
   --color-land-stroke: #9ca3af;
   --color-land-hover: #9ca3af;
   --color-land-cooldown: #fca5a5;
-  --color-land-1: #dcfce7;
-  --color-land-2: #86efac;
-  --color-land-3: #4ade80;
-  --color-land-4: #16a34a;
-  --color-land-5: #14532d;
+  --color-land-1: #d1ede8;
+  --color-land-2: #7ec4b5;
+  --color-land-3: #3a9b84;
+  --color-land-4: #1a7060;
+  --color-land-5: #105244;
 }
 
 @media (prefers-color-scheme: dark) {
