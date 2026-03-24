@@ -61,6 +61,19 @@ async function handleGetSightings(request: Request, env: Env): Promise<Response>
   return json(counts);
 }
 
+async function handleGetYears(env: Env): Promise<Response> {
+  const db = getDb(env);
+  const result = await db.execute(`
+    SELECT DISTINCT strftime('%Y', reported_at) as year
+    FROM sightings
+    ORDER BY year DESC
+  `);
+  const years = result.rows.map((row) => Number(row.year));
+  const currentYear = new Date().getFullYear();
+  if (!years.includes(currentYear)) years.unshift(currentYear);
+  return json(years);
+}
+
 async function handlePostSighting(request: Request, env: Env): Promise<Response> {
   let body: { bundesland?: string; nickname?: string; browser_id?: string };
   try {
@@ -117,6 +130,12 @@ export default {
 
       if (request.method === "GET") return handleGetSightings(request, env);
       if (request.method === "POST") return handlePostSighting(request, env);
+      return json({ error: "Method Not Allowed" }, 405);
+    }
+
+    if (url.pathname === "/api/years") {
+      await ensureSchema(env);
+      if (request.method === "GET") return handleGetYears(env);
       return json({ error: "Method Not Allowed" }, 405);
     }
 

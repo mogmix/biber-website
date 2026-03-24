@@ -3,11 +3,6 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { BUNDESLAENDER } from '../data/bundeslaender'
 import { useIdentity } from '../hooks/useIdentity'
 
-interface SightingCount {
-  bundesland: string
-  count: number
-}
-
 function getQuantileTier(count: number, sortedCounts: number[]): number {
   const n = sortedCounts.length
   if (n === 0) return 1
@@ -33,11 +28,12 @@ function formatCountdown(seconds: number): string {
 }
 
 interface GermanyMapProps {
-  year?: number
+  year: number
+  counts: Map<string, number>
+  onCountsChange: (updater: (prev: Map<string, number>) => Map<string, number>) => void
 }
 
-export default function GermanyMap({ year = new Date().getFullYear() }: GermanyMapProps) {
-  const [counts, setCounts] = useState<Map<string, number>>(new Map())
+export default function GermanyMap({ year: _year, counts, onCountsChange }: GermanyMapProps) {
   const [hovered, setHovered] = useState<string | null>(null)
   const [touchSelected, setTouchSelected] = useState<string | null>(null)
   const [cooldownUntil, setCooldownUntil] = useState<number>(loadCooldownUntil)
@@ -47,17 +43,6 @@ export default function GermanyMap({ year = new Date().getFullYear() }: GermanyM
   const [showNicknamePrompt, setShowNicknamePrompt] = useState(false)
   const nicknameRef = useRef<HTMLInputElement>(null)
   const latestPointerType = useRef('mouse')
-
-  useEffect(() => {
-    fetch(`/api/sightings?year=${year}`)
-      .then(r => r.json() as Promise<SightingCount[]>)
-      .then(data => {
-        const map = new Map<string, number>()
-        data.forEach(({ bundesland, count }) => map.set(bundesland, count))
-        setCounts(map)
-      })
-      .catch(() => {/* map renders with default colors on fetch failure */})
-  }, [year])
 
   useEffect(() => {
     const id = setInterval(() => setNow(Date.now()), 1000)
@@ -92,7 +77,7 @@ export default function GermanyMap({ year = new Date().getFullYear() }: GermanyM
     if (getGlobalCooldownSeconds() > 0) return
 
     // Optimistic update
-    setCounts(prev => {
+    onCountsChange(prev => {
       const next = new Map(prev)
       next.set(code, (next.get(code) ?? 0) + 1)
       return next
@@ -107,7 +92,7 @@ export default function GermanyMap({ year = new Date().getFullYear() }: GermanyM
 
       if (res.status === 429) {
         // Revert optimistic update
-        setCounts(prev => {
+        onCountsChange(prev => {
           const next = new Map(prev)
           next.set(code, Math.max(0, (next.get(code) ?? 1) - 1))
           return next
@@ -118,7 +103,7 @@ export default function GermanyMap({ year = new Date().getFullYear() }: GermanyM
         saveCooldownUntil(unlockMs)
       } else if (!res.ok) {
         // Revert optimistic update
-        setCounts(prev => {
+        onCountsChange(prev => {
           const next = new Map(prev)
           next.set(code, Math.max(0, (next.get(code) ?? 1) - 1))
           return next
@@ -131,7 +116,7 @@ export default function GermanyMap({ year = new Date().getFullYear() }: GermanyM
       }
     } catch {
       // Network error — revert optimistic update
-      setCounts(prev => {
+      onCountsChange(prev => {
         const next = new Map(prev)
         next.set(code, Math.max(0, (next.get(code) ?? 1) - 1))
         return next
