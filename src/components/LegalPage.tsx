@@ -40,8 +40,9 @@ export default function LegalPage({ content }: Props) {
       <main className="flex-1 py-8 px-4 sm:px-6">
         <div className="max-w-2xl mx-auto">
           <button
+            type="button"
             onClick={() => navigate('/')}
-            className="mb-6 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 flex items-center gap-1"
+            className="mb-6 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 flex items-center gap-1"
           >
             ← Zurück zur Karte
           </button>

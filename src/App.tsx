@@ -39,8 +39,14 @@ function MapView() {
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 flex flex-col">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:px-4 focus:py-2 focus:bg-white focus:text-gray-900 focus:rounded focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+      >
+        Zum Hauptinhalt springen
+      </a>
       <Header />
-      <main className="flex-1 py-6 px-4 sm:px-6">
+      <main id="main-content" className="flex-1 py-6 px-4 sm:px-6">
         <div className="max-w-lg mx-auto sm:max-w-2xl">
           <GermanyMap year={year} counts={counts} onCountsChange={setCounts} />
           <StatsPanel counts={counts} year={year} availableYears={availableYears} onYearChange={setYear} />

@@ -35,6 +35,7 @@ interface GermanyMapProps {
 
 export default function GermanyMap({ year: _year, counts, onCountsChange }: GermanyMapProps) {
   const [hovered, setHovered] = useState<string | null>(null)
+  const [focused, setFocused] = useState<string | null>(null)
   const [touchSelected, setTouchSelected] = useState<string | null>(null)
   const [cooldownUntil, setCooldownUntil] = useState<number>(loadCooldownUntil)
   const [now, setNow] = useState(Date.now())
@@ -48,6 +49,10 @@ export default function GermanyMap({ year: _year, counts, onCountsChange }: Germ
     const id = setInterval(() => setNow(Date.now()), 1000)
     return () => clearInterval(id)
   }, [])
+
+  useEffect(() => {
+    if (showNicknamePrompt) nicknameRef.current?.focus()
+  }, [showNicknamePrompt])
 
   function getGlobalCooldownSeconds(): number {
     return Math.max(0, Math.ceil((cooldownUntil - now) / 1000))
@@ -70,7 +75,6 @@ export default function GermanyMap({ year: _year, counts, onCountsChange }: Germ
   async function handleClick(code: string) {
     if (!nickname.trim()) {
       setShowNicknamePrompt(true)
-      setTimeout(() => nicknameRef.current?.focus(), 50)
       return
     }
 
@@ -153,18 +157,19 @@ export default function GermanyMap({ year: _year, counts, onCountsChange }: Germ
       <div className="flex items-center gap-2 mb-3 text-sm">
         {nickname && !showNicknamePrompt ? (
           <>
-            <span className="text-gray-500 dark:text-gray-400">Gemeldet als</span>
+            <span className="text-gray-600 dark:text-gray-400">Gemeldet als</span>
             <span className="font-medium text-gray-800 dark:text-gray-200">{nickname}</span>
             <button
+              type="button"
               onClick={() => { setNicknameInput(nickname); setShowNicknamePrompt(true) }}
-              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 underline"
+              className="text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 underline"
             >
               ändern
             </button>
           </>
         ) : (
           <>
-            <label htmlFor="nickname-input" className="text-gray-500 dark:text-gray-400 shrink-0">
+            <label htmlFor="nickname-input" className="text-gray-600 dark:text-gray-400 shrink-0">
               Dein Name:
             </label>
             <input
@@ -179,6 +184,7 @@ export default function GermanyMap({ year: _year, counts, onCountsChange }: Germ
               className="border border-gray-300 dark:border-gray-600 rounded px-2 py-0.5 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 flex-1 min-w-0"
             />
             <button
+              type="button"
               onClick={handleNicknameSave}
               disabled={!nicknameInput.trim()}
               className="px-2 py-0.5 rounded bg-green-600 text-white text-sm disabled:opacity-40 hover:bg-green-700"
@@ -189,17 +195,29 @@ export default function GermanyMap({ year: _year, counts, onCountsChange }: Germ
         )}
       </div>
 
+      <div
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+        className="sr-only"
+      >
+        {globalCooldownSeconds > 0
+          ? `Karte gesperrt. Erneute Meldung möglich in ${formatCountdown(globalCooldownSeconds)}.`
+          : ''}
+      </div>
+
       <Tooltip.Provider delayDuration={100}>
         <svg
           viewBox="0 0 500 600"
           xmlns="http://www.w3.org/2000/svg"
           className="w-full h-auto block"
-          aria-label="Karte der deutschen Bundesländer"
-          role="img"
+          aria-label="Karte der deutschen Bundesländer — Bundesland anklicken um eine Sichtung zu melden"
+          role="group"
         >
           {BUNDESLAENDER.map(({ code, name, d }) => {
             const count = counts.get(code) ?? 0
             const isTooltipOpen = touchSelected === code || hovered === code
+            const isFocused = focused === code
             return (
               <Tooltip.Root
                 key={code}
@@ -213,20 +231,32 @@ export default function GermanyMap({ year: _year, counts, onCountsChange }: Germ
               >
                 <Tooltip.Trigger asChild>
                   <g
+                    tabIndex={0}
+                    role="button"
+                    aria-label={`${name}: ${count} ${count === 1 ? 'Sichtung' : 'Sichtungen'}${globalCooldownSeconds > 0 ? `. Gesperrt für ${formatCountdown(globalCooldownSeconds)}` : ''}`}
+                    aria-disabled={globalCooldownSeconds > 0 ? 'true' : undefined}
                     onPointerEnter={(e) => { if (e.pointerType !== 'touch') setHovered(code) }}
                     onPointerLeave={(e) => { if (e.pointerType !== 'touch') setHovered(null) }}
                     onPointerDown={(e) => { latestPointerType.current = e.pointerType }}
                     onClick={(e) => handleRegionInteraction(e, code)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault()
+                        handleClick(code)
+                      }
+                    }}
+                    onFocus={() => { setFocused(code); setHovered(code) }}
+                    onBlur={() => { setFocused(null); setHovered(null) }}
                     style={{ cursor: globalCooldownSeconds > 0 ? 'not-allowed' : 'pointer' }}
+                    className="focus:outline-none"
                   >
                     <path
                       data-land={code}
-                      aria-label={name}
                       d={d}
                       style={{
                         fill: getFill(code),
-                        stroke: 'var(--color-land-stroke)',
-                        strokeWidth: 1,
+                        stroke: isFocused ? '#3b82f6' : 'var(--color-land-stroke)',
+                        strokeWidth: isFocused ? 2 : 1,
                       }}
                     />
                   </g>
@@ -237,7 +267,7 @@ export default function GermanyMap({ year: _year, counts, onCountsChange }: Germ
                     sideOffset={5}
                   >
                     <span className="font-medium">{name}</span>
-                    <span className="text-gray-500 dark:text-gray-400 ml-2">
+                    <span className="text-gray-600 dark:text-gray-400 ml-2">
                       {count} {count === 1 ? 'Sichtung' : 'Sichtungen'}
                     </span>
                     {globalCooldownSeconds > 0 && (
