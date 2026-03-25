@@ -1,13 +1,13 @@
-import { useState, useEffect } from 'react'
-import GermanyMap from './components/GermanyMap'
-import StatsPanel from './components/StatsPanel'
-import Header from './components/Header'
-import Footer from './components/Footer'
-import LegalPage from './components/LegalPage'
+import { useEffect, useState } from 'react'
 import ErrorBoundary from './components/ErrorBoundary'
-import { usePathname } from './hooks/useRouter'
-import impressumContent from './content/impressum.md?raw'
+import Footer from './components/Footer'
+import GermanyMap from './components/GermanyMap'
+import Header from './components/Header'
+import LegalPage from './components/LegalPage'
+import StatsPanel from './components/StatsPanel'
 import datenschutzContent from './content/datenschutz.md?raw'
+import impressumContent from './content/impressum.md?raw'
+import { usePathname } from './hooks/useRouter'
 
 interface SightingCount {
   bundesland: string
@@ -62,9 +62,17 @@ function MapView() {
       </a>
       <Header />
       <div className="w-full px-4 sm:px-6 py-2 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-        <p className="max-w-lg sm:max-w-2xl mx-auto text-sm text-gray-500 dark:text-gray-400">
-          🦫 Wir nagen uns vor — eine Sichtung nach der anderen.
-        </p>
+        <div className="max-w-lg sm:max-w-2xl mx-auto flex items-center gap-4">
+          <p className="text-sm text-gray-500 dark:text-gray-400 flex-1">
+            Wir nagen uns vor — eine Sichtung nach der anderen.
+          </p>
+          <img
+            src="/beaver-illustration.png"
+            alt=""
+            aria-hidden="true"
+            className="lg:hidden h-16 w-auto shrink-0 object-contain"
+          />
+        </div>
       </div>
       <main id="main-content" className="flex-1 py-6 px-4 sm:px-6">
         <div className="max-w-4xl mx-auto flex flex-col lg:flex-row lg:gap-12 lg:items-start">
